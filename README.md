@@ -1,6 +1,6 @@
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/nodes-app/latest-version-action)
 
-# Latest Version Action
+# latest-version-action
 
 This action outputs the latest release version of a GitHub repository.
 
