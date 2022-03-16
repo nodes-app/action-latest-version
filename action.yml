@@ -1,0 +1,15 @@
+name: Hello
+description: Say hello
+branding:
+  icon: activity
+  color: blue
+inputs:
+  foo:
+    description: Foo
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        echo 'Hello, World!'
