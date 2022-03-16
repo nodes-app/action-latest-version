@@ -6,8 +6,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Test Action
+      
+      - name: Get Latest Version
+        id: latest-version
         uses: ./
         with:
-          foo: bar
+          repository: nodes-app/latest-version-action
+
+      - name: Output Latest Version
+        run: |
+          echo "Latest version: ${{ steps.latest-version.outputs.version }}"

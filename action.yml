@@ -1,15 +1,52 @@
-name: Hello
-description: Say hello
+name: Get Latest Release Version
+description: Get the Latest Release Version of a GitHub Repository
 branding:
   icon: activity
   color: blue
 inputs:
-  foo:
-    description: Foo
+  repository:
+    description: Repository (<user/org name>/<repository name>)
     required: true
+  token:
+    description: Access Token
+    required: false
+    default: ${{ github.token }}
+outputs:
+  version:
+    description: Latest Version
+    value: ${{ steps.get-version.outputs.version }}
+
 runs:
   using: composite
   steps:
-    - shell: bash
+    - id: get-version
+      shell: bash
+      env:
+        REPOSITORY: ${{ inputs.repository }}
+        TOKEN: ${{ inputs.token }}
       run: |
-        echo 'Hello, World!'
+        # Check Visibility
+        NAME=$(curl -s "https://api.github.com/repos/$REPOSITORY/releases/latest" | jq -r '.name')
+        IS_PUBLIC=$(! [ "$NAME" != "null" ]; echo $?)
+        
+        # Set Auth Header
+        if [ $IS_PUBLIC == 0 ]; then
+          AUTH_HEADER="authorization: Bearer $TOKEN"
+        fi
+        
+        # Get Version
+        URL="https://api.github.com/repos/$REPOSITORY/releases/latest"
+        VERSION=$(curl -s ${AUTH_HEADER:+ -H "$AUTH_HEADER"} $URL | jq -r '.tag_name')
+        
+        # Check Result
+        if [ $VERSION == "null" ]; then
+          echo "Failed to get latest version. No release found."
+        fi
+        
+        # Trim 'v' prefix
+        if [[ $VERSION == v* ]]; then
+          VERSION="${VERSION:1}"
+        fi
+        
+        # Set Output
+        echo "::set-output name=version::$VERSION"
